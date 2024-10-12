@@ -16,6 +16,7 @@ export async function loginUser(
 		throw new Error("Invalid credentials");
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
 	return {
 		id: user.id,
@@ -57,6 +58,7 @@ export async function registerUser(
 	}
 
 	// Return user without password
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const { password: _, ...userWithoutPassword } = newUser;
 	return userWithoutPassword;
 }

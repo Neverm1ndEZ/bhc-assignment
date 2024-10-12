@@ -23,6 +23,7 @@ export async function POST(request: Request) {
 			expiresIn: "1h",
 		});
 
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { password: _, ...userWithoutPassword } = user;
 
 		console.log("Login successful for user:", userWithoutPassword);

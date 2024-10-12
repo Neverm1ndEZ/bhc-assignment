@@ -28,12 +28,12 @@ export default function AdminUsersPage() {
 		return null;
 	}
 
-	console.log("users:", users);
+	// console.log("users:", users);
 
 	return (
 		<div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
 			<h1 className="text-3xl font-bold mb-8">Manage Users</h1>
-			<UserList onUserUpdate={fetchUsers} />
+			<UserList users={users} onUserUpdate={fetchUsers} />
 		</div>
 	);
 }

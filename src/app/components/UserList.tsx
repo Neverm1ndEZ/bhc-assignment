@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { User } from "@/app/types";
 
 interface UserListProps {
+	users: User[];
 	onUserUpdate: () => void;
 }
 
@@ -10,10 +11,23 @@ export default function UserList({ onUserUpdate }: UserListProps) {
 	const [newPassword, setNewPassword] = useState("");
 	const [selectedUser, setSelectedUser] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [message, setMessage] = useState<{
+		type: "success" | "error";
+		text: string;
+	} | null>(null);
 
 	useEffect(() => {
 		fetchUsers();
 	}, []);
+
+	useEffect(() => {
+		if (message) {
+			const timer = setTimeout(() => {
+				setMessage(null);
+			}, 3000);
+			return () => clearTimeout(timer);
+		}
+	}, [message]);
 
 	const fetchUsers = async () => {
 		try {
@@ -22,11 +36,17 @@ export default function UserList({ onUserUpdate }: UserListProps) {
 			if (response.ok) {
 				const data = await response.json();
 				setUsers(data);
+				setMessage({ type: "success", text: "Users fetched successfully" });
 			} else {
-				throw new Error("Failed to fetch users");
+				const errorData = await response.json();
+				throw new Error(errorData.error || "Failed to fetch users");
 			}
 		} catch (error) {
 			console.error("Error fetching users:", error);
+			setMessage({
+				type: "error",
+				text: error instanceof Error ? error.message : "Failed to fetch users",
+			});
 		} finally {
 			setLoading(false);
 		}
@@ -42,22 +62,41 @@ export default function UserList({ onUserUpdate }: UserListProps) {
 				body: JSON.stringify({ userId, password: newPassword }),
 			});
 
-			if (response.ok) {
+			const data = await response.json();
+
+			if (response.status === 200) {
 				setNewPassword("");
 				setSelectedUser(null);
 				onUserUpdate();
+				setMessage({ type: "success", text: "Password updated successfully" });
 				fetchUsers();
 			} else {
-				throw new Error("Failed to update password");
+				throw new Error(data.error || "Failed to update password");
 			}
 		} catch (error) {
 			console.error("Error updating password:", error);
+			setMessage({
+				type: "error",
+				text:
+					error instanceof Error ? error.message : "Failed to update password",
+			});
 		}
 	};
 
 	return (
 		<div className="bg-white shadow-lg rounded-lg p-6 max-w-7xl mx-auto">
 			<h2 className="text-3xl font-bold mb-6 text-gray-800">User List</h2>
+			{message && (
+				<div
+					className={`mb-4 p-4 rounded-md ${
+						message.type === "success"
+							? "bg-green-100 text-green-700"
+							: "bg-red-100 text-red-700"
+					}`}
+				>
+					{message.text}
+				</div>
+			)}
 			{loading ? (
 				<div className="flex justify-center items-center h-40">
 					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>

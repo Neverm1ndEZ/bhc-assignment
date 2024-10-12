@@ -8,6 +8,7 @@ export async function GET() {
 		const users = await usersCollection.find({}).toArray();
 
 		// Remove password field from each user object
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const sanitizedUsers = users.map(({ password, ...user }) => user);
 
 		return NextResponse.json(sanitizedUsers);
